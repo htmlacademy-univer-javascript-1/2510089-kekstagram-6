@@ -10,8 +10,11 @@ const descriptionInput = form.querySelector('.text__description');
 const submitButton = form.querySelector('#upload-submit');
 const body = document.body;
 const hashtagInput = form.querySelector('.text__hashtags');
+const imagePreview = document.querySelector('.img-upload__preview img');
+const effectsPreviews = document.querySelectorAll('.effects__preview');
 
 const MAX_COMMENT_LENGTH = 140;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 pristine.addValidator(
   descriptionInput,
@@ -86,6 +89,8 @@ function closeForm() {
   uploadInput.value = '';
   resetEffects();
 
+  imagePreview.src = 'img/upload-default-image.jpg';
+
   submitButton.disabled = false;
   submitButton.textContent = 'Опубликовать';
 }
@@ -98,11 +103,36 @@ function openForm() {
   validateForm();
 }
 
+const loadUserImage = () => {
+  const file = uploadInput.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const matches = FILE_TYPES.some((type) => fileName.endsWith(type));
+
+  if (!matches) {
+    uploadInput.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.addEventListener('load', () => {
+    imagePreview.src = reader.result;
+
+    effectsPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${reader.result})`;
+    });
+  });
+
+  reader.readAsDataURL(file);
+};
+
 descriptionInput.addEventListener('input', validateForm);
 hashtagInput.addEventListener('input', validateForm);
 
 uploadInput.addEventListener('change', () => {
   if (uploadInput.files.length > 0) {
+    loadUserImage();
     openForm();
   }
 });
@@ -138,6 +168,7 @@ form.addEventListener('submit', (evt) => {
 form.addEventListener('reset', () => {
   pristine.reset();
   resetEffects();
+  imagePreview.src = 'img/upload-default-image.jpg';
 });
 
 uploadCancel.addEventListener('click', (evt) => {
