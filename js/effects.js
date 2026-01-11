@@ -1,12 +1,14 @@
 const MIN_SCALE = 25;
 const MAX_SCALE = 100;
 const STEP_SCALE = 25;
+const DEFAULT_SCALE = 100;
 
 const form = document.querySelector('.img-upload__form');
 const zoomOutBtnElement = form.querySelector('.scale__control--smaller');
 const zoomInBtnElement = form.querySelector('.scale__control--bigger');
 const scaleValueElement = form.querySelector('.scale__control--value');
 const imageElement = form.querySelector('.img-upload__preview img');
+const effectsPreviews = document.querySelectorAll('.effects__preview');
 
 const effectsListElement = form.querySelector('.effects__list');
 const sliderContainer = form.querySelector('.img-upload__effect-level');
@@ -58,7 +60,9 @@ const Effects = {
   }
 };
 
-let currentEffect = 'none';
+const DEFAULT_EFFECT = 'none';
+
+let currentEffect = DEFAULT_EFFECT;
 
 function applyScale(value) {
   const scale = value / 100;
@@ -77,11 +81,11 @@ zoomInBtnElement.addEventListener('click', () => {
 });
 
 function initScale() {
-  applyScale(100);
+  applyScale(DEFAULT_SCALE);
 }
 
 function applyEffect() {
-  if (currentEffect === 'none') {
+  if (currentEffect === DEFAULT_EFFECT) {
     imageElement.style.filter = '';
     sliderContainer.classList.add('hidden');
     effectValueElement.value = '';
@@ -93,7 +97,9 @@ function applyEffect() {
   const filterValue = `${effect.filter}(${sliderValue}${effect.unit})`;
 
   imageElement.style.filter = filterValue;
-  effectValueElement.value = sliderValue;
+
+  const formattedValue = parseFloat(sliderValue).toString();
+  effectValueElement.value = formattedValue;
 }
 
 function createSlider() {
@@ -103,7 +109,7 @@ function createSlider() {
 
   const effect = Effects[currentEffect];
 
-  if (currentEffect === 'none') {
+  if (currentEffect === DEFAULT_EFFECT) {
     sliderContainer.classList.add('hidden');
     imageElement.style.filter = '';
     effectValueElement.value = '';
@@ -130,7 +136,7 @@ function onEffectChange(evt) {
   currentEffect = evt.target.value;
   createSlider();
 
-  if (currentEffect !== 'none') {
+  if (currentEffect !== DEFAULT_EFFECT) {
     const effect = Effects[currentEffect];
     const filterValue = `${effect.filter}(${effect.start}${effect.unit})`;
     imageElement.style.filter = filterValue;
@@ -139,7 +145,7 @@ function onEffectChange(evt) {
 }
 
 function resetEffects() {
-  currentEffect = 'none';
+  currentEffect = DEFAULT_EFFECT;
   initScale();
 
   const noneRadio = document.querySelector('#effect-none');
@@ -155,6 +161,10 @@ function resetEffects() {
   imageElement.style.filter = '';
   effectValueElement.value = '';
   imageElement.style.transform = 'scale(1)';
+
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = 'url("img/upload-default-image.jpg")';
+  });
 }
 
 function initEffects() {

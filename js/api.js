@@ -1,34 +1,39 @@
 const Urls = {
-  GET: 'https://29.javascript.htmlacademy.pro/kekstagram/data',
-  POST: 'https://29.javascript.htmlacademy.pro/kekstagram',
+  GET: 'https://32.javascript.htmlacademy.pro/kekstagram/data',
+  POST: 'https://32.javascript.htmlacademy.pro/kekstagram/',
 };
 
-const getDataFromServer = (onSuccess, onFail) => {
-  fetch(Urls.GET)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error();
-      }
-      return response.json();
-    })
-    .then((photos) => onSuccess(photos))
-    .catch(() => onFail('При загрузке данных с сервера произошла ошибка'));
-};
-
-const sendDataToServer = (onSuccess, onFail, body) => {
-  fetch(Urls.POST,
+const requestToServer = (method, onSuccess, onFail, body = null, errorMessage) => {
+  fetch(Urls[method],
     {
-      method: 'POST',
+      method: method,
       body,
     }
   ).then((response) => {
     if (response.ok) {
-      onSuccess();
+      if (method === 'GET') {
+        return response.json();
+      } else {
+        onSuccess();
+      }
     } else {
-      onFail('Не удалось опубликовать');
+      onFail(errorMessage);
     }
   })
-    .catch(() => onFail('Не удалось опубликовать'));
+    .then((data) => {
+      if (method === 'GET' && data) {
+        onSuccess(data);
+      }
+    })
+    .catch(() => onFail(errorMessage));
+};
+
+const getDataFromServer = (onSuccess, onFail) => {
+  requestToServer('GET', onSuccess, onFail, null, 'При загрузке данных с сервера произошла ошибка');
+};
+
+const sendDataToServer = (onSuccess, onFail, body) => {
+  requestToServer('POST', onSuccess, onFail, body, 'Не удалось опубликовать');
 };
 
 export { getDataFromServer, sendDataToServer };

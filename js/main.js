@@ -4,6 +4,7 @@ import './form.js';
 import { initEffects } from './effects.js';
 import { getDataFromServer } from './api.js';
 import { initFilters } from './filters.js';
+import { isEscapeKey } from './util.js';
 
 let photos = [];
 
@@ -28,6 +29,7 @@ const onSuccess = (data) => {
 
 const onFail = (errorMessage) => {
   const messageAlert = document.createElement('div');
+  messageAlert.classList.add('data-error');
   messageAlert.style.position = 'fixed';
   messageAlert.style.left = '50%';
   messageAlert.style.top = '50%';
@@ -69,7 +71,7 @@ const onFail = (errorMessage) => {
   document.body.appendChild(messageAlert);
 
   const onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
       messageAlert.remove();
       document.removeEventListener('keydown', onEscKeyDown);
     }
@@ -92,4 +94,6 @@ const initApp = () => {
 
 initApp();
 
-export { photos };
+const getPhotos = () => photos;
+
+export { getPhotos };

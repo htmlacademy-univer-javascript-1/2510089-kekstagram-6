@@ -1,4 +1,3 @@
-// hashtags-pristine.js
 const MAX_SYMBOLS = 20;
 const MAX_HASHTAGS = 5;
 
@@ -6,7 +5,7 @@ const formUpload = document.querySelector('.img-upload__form');
 const inputHashtag = formUpload.querySelector('.text__hashtags');
 const submitButton = formUpload.querySelector('#upload-submit');
 
-// Создаем экземпляр Pristine
+
 const pristine = new Pristine(formUpload, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload__item--invalid',
@@ -18,7 +17,7 @@ const pristine = new Pristine(formUpload, {
 
 let errorMessage = '';
 
-const error = () => errorMessage;
+const getErrorMessage = () => errorMessage;
 
 const hashtagsHandler = (value) => {
   errorMessage = '';
@@ -26,7 +25,7 @@ const hashtagsHandler = (value) => {
   const inputText = value.toLowerCase().trim();
 
   if (!inputText) {
-    return true; // Пустое поле допустимо
+    return true;
   }
 
   const inputArray = inputText.split(/\s+/);
@@ -71,7 +70,7 @@ const hashtagsHandler = (value) => {
   });
 };
 
-pristine.addValidator(inputHashtag, hashtagsHandler, error);
+pristine.addValidator(inputHashtag, hashtagsHandler, getErrorMessage);
 
 inputHashtag.addEventListener('input', () => {
   const isValid = pristine.validate();
