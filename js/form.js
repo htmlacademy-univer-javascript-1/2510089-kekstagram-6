@@ -13,16 +13,10 @@ const body = document.body;
 const hashtagInput = form.querySelector('.text__hashtags');
 const imagePreview = document.querySelector('.img-upload__preview img');
 const effectsPreviews = document.querySelectorAll('.effects__preview');
-<<<<<<< HEAD
 const MAX_COMMENT_LENGTH = 140;
 const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 let isErrorMessageOpen = false;
-=======
-
-const MAX_COMMENT_LENGTH = 140;
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
->>>>>>> ecd0300a7e5f01c97c495ce738af6ba9c64285d8
 
 pristine.addValidator(
   descriptionInput,
@@ -135,14 +129,11 @@ function openForm() {
   validateForm();
 }
 
-<<<<<<< HEAD
 function onUploadCancelClick(evt) {
   evt.preventDefault();
   closeForm();
 }
 
-=======
->>>>>>> ecd0300a7e5f01c97c495ce738af6ba9c64285d8
 const loadUserImage = () => {
   const file = uploadInput.files[0];
   const fileName = file.name.toLowerCase();
@@ -154,7 +145,6 @@ const loadUserImage = () => {
     return;
   }
 
-<<<<<<< HEAD
   const imageUrl = URL.createObjectURL(file);
 
   imagePreview.src = imageUrl;
@@ -174,23 +164,6 @@ function onHashtagInput() {
 
 descriptionInput.addEventListener('input', onDescriptionInput);
 hashtagInput.addEventListener('input', onHashtagInput);
-=======
-  const reader = new FileReader();
-
-  reader.addEventListener('load', () => {
-    imagePreview.src = reader.result;
-
-    effectsPreviews.forEach((preview) => {
-      preview.style.backgroundImage = `url(${reader.result})`;
-    });
-  });
-
-  reader.readAsDataURL(file);
-};
-
-descriptionInput.addEventListener('input', validateForm);
-hashtagInput.addEventListener('input', validateForm);
->>>>>>> ecd0300a7e5f01c97c495ce738af6ba9c64285d8
 
 uploadInput.addEventListener('change', () => {
   if (uploadInput.files.length > 0) {
