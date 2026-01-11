@@ -1,6 +1,7 @@
 import { pristine } from './hashtags-pristine.js';
 import { sendDataToServer } from './api.js';
 import { resetEffects } from './effects.js';
+import { isEscapeKey } from './util.js';
 
 const form = document.querySelector('#upload-select-image');
 const uploadInput = document.querySelector('#upload-file');
@@ -12,9 +13,10 @@ const body = document.body;
 const hashtagInput = form.querySelector('.text__hashtags');
 const imagePreview = document.querySelector('.img-upload__preview img');
 const effectsPreviews = document.querySelectorAll('.effects__preview');
-
 const MAX_COMMENT_LENGTH = 140;
 const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+
+let isErrorMessageOpen = false;
 
 pristine.addValidator(
   descriptionInput,
@@ -25,10 +27,15 @@ pristine.addValidator(
 const validateForm = () => {
   const isValid = pristine.validate();
   submitButton.disabled = !isValid;
+  return isValid;
 };
 
 const onDocumentKeydown = (evt) => {
-  if (evt.key === 'Escape' && !uploadOverlay.classList.contains('hidden')) {
+  if (isEscapeKey(evt) && !uploadOverlay.classList.contains('hidden')) {
+    if (isErrorMessageOpen) {
+      return;
+    }
+
     if (evt.target === hashtagInput || evt.target === descriptionInput) {
       evt.stopPropagation();
       return;
@@ -47,14 +54,22 @@ function showMessage(type, errorMessage = '') {
     message.querySelector('.error__title').textContent = errorMessage;
   }
 
+  message.style.zIndex = '10000';
+
   function closeMessage() {
     message.remove();
     document.removeEventListener('keydown', onMessageEscKeyDown);
     message.removeEventListener('click', onMessageClick);
+
+    if (type === 'error') {
+      isErrorMessageOpen = false;
+    }
   }
 
   function onMessageEscKeyDown(evt) {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
+      evt.stopPropagation();
+      evt.preventDefault();
       closeMessage();
     }
   }
@@ -65,13 +80,23 @@ function showMessage(type, errorMessage = '') {
     }
   }
 
-  messageButton.addEventListener('click', closeMessage);
+  messageButton.addEventListener('click', onMessageCloseClick);
   message.addEventListener('click', onMessageClick);
   document.addEventListener('keydown', onMessageEscKeyDown);
   document.body.append(message);
 
   if (type === 'error') {
+    isErrorMessageOpen = true;
     messageButton.focus();
+  }
+
+  return message;
+}
+
+function onMessageCloseClick() {
+  const message = document.querySelector('.success, .error');
+  if (message) {
+    message.remove();
   }
 }
 
@@ -81,7 +106,7 @@ const showErrorMessage = (errorMessage) => showMessage('error', errorMessage);
 function closeForm() {
   uploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
-  uploadCancel.removeEventListener('click', closeForm);
+  uploadCancel.removeEventListener('click', onUploadCancelClick);
   document.removeEventListener('keydown', onDocumentKeydown);
 
   form.reset();
@@ -96,11 +121,17 @@ function closeForm() {
 }
 
 function openForm() {
+  isErrorMessageOpen = false;
   uploadOverlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  uploadCancel.addEventListener('click', closeForm);
+  uploadCancel.addEventListener('click', onUploadCancelClick);
   document.addEventListener('keydown', onDocumentKeydown);
   validateForm();
+}
+
+function onUploadCancelClick(evt) {
+  evt.preventDefault();
+  closeForm();
 }
 
 const loadUserImage = () => {
@@ -114,21 +145,25 @@ const loadUserImage = () => {
     return;
   }
 
-  const reader = new FileReader();
+  const imageUrl = URL.createObjectURL(file);
 
-  reader.addEventListener('load', () => {
-    imagePreview.src = reader.result;
+  imagePreview.src = imageUrl;
 
-    effectsPreviews.forEach((preview) => {
-      preview.style.backgroundImage = `url(${reader.result})`;
-    });
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = `url(${imageUrl})`;
   });
-
-  reader.readAsDataURL(file);
 };
 
-descriptionInput.addEventListener('input', validateForm);
-hashtagInput.addEventListener('input', validateForm);
+function onDescriptionInput() {
+  validateForm();
+}
+
+function onHashtagInput() {
+  validateForm();
+}
+
+descriptionInput.addEventListener('input', onDescriptionInput);
+hashtagInput.addEventListener('input', onHashtagInput);
 
 uploadInput.addEventListener('change', () => {
   if (uploadInput.files.length > 0) {
@@ -171,7 +206,4 @@ form.addEventListener('reset', () => {
   imagePreview.src = 'img/upload-default-image.jpg';
 });
 
-uploadCancel.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  closeForm();
-});
+uploadCancel.addEventListener('click', onUploadCancelClick);
