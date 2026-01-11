@@ -54,7 +54,7 @@ function showMessage(type, errorMessage = '') {
     message.querySelector('.error__title').textContent = errorMessage;
   }
 
-  message.style.zIndex = '10000';
+  message.style.zIndex = '20000';
 
   function closeMessage() {
     message.remove();
