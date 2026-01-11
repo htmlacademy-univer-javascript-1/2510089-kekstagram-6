@@ -7,6 +7,7 @@ const zoomOutBtnElement = form.querySelector('.scale__control--smaller');
 const zoomInBtnElement = form.querySelector('.scale__control--bigger');
 const scaleValueElement = form.querySelector('.scale__control--value');
 const imageElement = form.querySelector('.img-upload__preview img');
+const effectsPreviews = document.querySelectorAll('.effects__preview');
 
 const effectsListElement = form.querySelector('.effects__list');
 const sliderContainer = form.querySelector('.img-upload__effect-level');
@@ -155,6 +156,10 @@ function resetEffects() {
   imageElement.style.filter = '';
   effectValueElement.value = '';
   imageElement.style.transform = 'scale(1)';
+
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = 'url("img/upload-default-image.jpg")';
+  });
 }
 
 function initEffects() {
